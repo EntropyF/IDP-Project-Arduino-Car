@@ -72,12 +72,13 @@ void loop() {
     LEDblink();
     // Dis.ColourRecognition();
     // LineFollowerSlow();
-    // Line.Junction();
+    // Line.Junction1();
     PinTime();
 
     // Testing Area (10ms execution base)
     SystemUpdate();
     // TestCode();
+    // TwoLoop();
 
     // ### TEST: stability of rotation (360 degree) ###
     // Want it to stay in the starting box
@@ -156,7 +157,7 @@ void LineFollower() {
   if ((digitalRead(LeftSensor) == 0) && (digitalRead(RightSensor) == 0)) {  // Set Motor speed to move forward when front sensor is active
     Mcon.SetMotors(180, 165);
   } else if (digitalRead(RightSensor) == 1) {  // Set Motor speed to turn right when right sensor is active
-    Mcon.SetMotors(220, -180);
+    Mcon.SetMotors(200, -100);
   } else if (digitalRead(LeftSensor) == 1) {  // Set Motor speed to turn left when left sensor is active
     Mcon.SetMotors(-180, 220);
   }
@@ -167,32 +168,43 @@ void LineFollowerSlow() {
   if ((digitalRead(LeftSensor) == 0) && (digitalRead(RightSensor) == 0)) {  // Set Motor speed to move forward when front sensor is active
     Mcon.SetMotors(150, 130);
   } else if (digitalRead(RightSensor) == 1) {  // Set Motor speed to turn right when right sensor is active
-    Mcon.SetMotors(220, -150);
+    Mcon.SetMotors(220, 0);
   } else if (digitalRead(LeftSensor) == 1) {  // Set Motor speed to turn left when left sensor is active
     Mcon.SetMotors(-150, 220);
+  }
+}
+
+void Position() {
+  if ((digitalRead(LeftSensor) == 0) && (digitalRead(RightSensor) == 0)) {  // Set Motor speed to move forward when front sensor is active
+    Mcon.SetMotors(150, 130);
+  } else if (digitalRead(RightSensor) == 1) {  // Set Motor speed to turn right when right sensor is active
+    Mcon.SetMotors(180, 100);
+  } else if (digitalRead(LeftSensor) == 1) {  // Set Motor speed to turn left when left sensor is active
+    Mcon.SetMotors(100, 180);
   }
 }
 
 // TestCode for picking the block and colour detect
 void TestCode() {
   // An example to test GoHome1 function (Basically, to set the environment for this function: RightDetect No.)
-  // if (m == 10) {
-  //   Line.RightDetect = 2;
-  // } else if ((m > 100) && (Line.RightDetect = 2)) {
-  //   LineFollowerSlow();
-  // } else if (Line.RightDetect = 3) {
-  //   GoHome1();
-  // } else if (Line.RightDetect = 5) {
-  //   StopMotor();
-  // }
-  Line.Junction();
-  if ((m > 100) && (Line.RightDetect == 0)) {
+  if (m == 10) {
+    Line.RightDetect = 3;
+  } else if ((m > 100) && (Line.LeftDetect = 0)) {
     LineFollowerSlow();
-  } else if (Line.RightDetect == 1) {
-    PickBlock();
-  } else if (Line.RightDetect == 2) {
+  } else if (Line.LeftDetect = 1) {
+    GoHome2();
+  } else {
     StopMotor();
   }
+  Line.Junction1();
+  Line.Junction();
+  // if ((m > 100) && (Line.RightDetect == 0)) {
+  //   LineFollowerSlow();
+  // } else if (Line.RightDetect == 1) {
+  //   PickBlock();
+  // } else if (Line.RightDetect == 2) {
+  //   StopMotor();
+  // }
 }
 
 // Mcon.Reset() goes directly below a rotation
@@ -207,7 +219,7 @@ void SystemUpdate() {
   } else if ((m >= 800) && (m <= 900)) {
     Mcon.SetMotors(150, 135);
   } else if ((m > 900) && (Line.RightDetect == 0)) {
-    LineFollowerSlow();
+    LineFollower();
   } else if (Line.RightDetect == 1) {
     PickBlock();
   }
@@ -229,9 +241,9 @@ void SystemUpdate() {
   if (m > 1000) {
     Line.Junction();
   }
-  if ((Line.RightDetect == 3) && (m > JDT4 + 1050)) {
-    Line.Junction1();
-  }
+  // if ((Line.RightDetect == 3) && (m > JDT3 + 1050)) {
+  //   Line.Junction1();
+  // }
 }
 
 void TwoLoop() {
@@ -376,13 +388,17 @@ void PickBlock() {
     Mcon.SetMotors(150, 135);  // Flexible. To reach correct position
   } else if (m == JDT + 100) {
     Mcon.Reset();
-  } else if ((m > JDT + 100) && (m < JDT + 300)) {  // ### Rotation MARK ###
-    Mcon.RightRotate(140);
+  } else if ((m > JDT + 100) && (m < JDT + 280)) {  // ### Rotation MARK ###
+    Mcon.RightRotate(134);
+  } else if ((m > JDT + 280) && (m < JDT + 300)) {  // ### Rotation MARK ###
+    Mcon.SetMotors(150, 135);
   } else if (m == JDT + 300) {  // Reset rotation information
     Mcon.Reset();
   } else if ((m > JDT + 300) && (m < JDT + 850)) {  // Colour recognition
     StopMotor();
     Dis.ColourRecognition();
+  } else if ((m > JDT + 880) && (m < JDT + 900)) {  // ### Rotation MARK ###
+    Mcon.SetMotors(-150, -135);
   } else if ((m > JDT + 900) && (m < JDT + 1100)) {  // Pick block
     StopMotor();
     if ((m > JDT + 1000) && (m < JDT + 1100)) {
@@ -391,7 +407,7 @@ void PickBlock() {
   } else if (m == JDT + 1100) {  // set block collect to 1 state
     BlockCOLLECT = 1;
   } else if ((m > JDT + 1100) && (m < JDT + 1350)) {  // Go back to line // ### Rotation MARK ###
-    Mcon.RightRotate(150);
+    Mcon.RightRotate(140);
   } else if (m == 1350) {  // Go back to line
     Mcon.Reset();
   } else if ((m > JDT + 1350) && (m < JDT + 1400)) {  // Move a bit forward
@@ -419,20 +435,21 @@ void EnterRed() {
     StopMotor();
   } else if ((m == JDT3 + 650)) {  // block is put down, set state to 0
     BlockCOLLECT = 0;
-  } else if ((m > JDT3 + 650) && (m < JDT3 + 800)) {  // go out of box
+  } else if ((m > JDT3 + 650) && (m < JDT3 + 750)) {  // go out of box
     Mcon.SetMotors(-150, -135);
-  } else if ((m > JDT3 + 800) && (m < JDT3 + 1000)) {  // ### Rotation MARK ###
+  } else if ((m > JDT3 + 750) && (m < JDT3 + 1000)) {  // ### Rotation MARK ###
     Mcon.RightRotate(150);
   } else if (m == JDT3 + 1000) {  // Reset rotation information
     Mcon.Reset();
-  } else if ((m > JDT3 + 1000) && (m < JDT3 + 1100)) {
+  } else if ((m > JDT3 + 1000) && (m < JDT3 + 1200)) {
     Mcon.SetMotors(150, 135);  // Flexible. To reach correct position
-  } else if (m > JDT3 + 1100) {
+  } else if (m > JDT3 + 1200) {
     Line.Junction1();
     if (Line.LeftDetect == 0) {
       LineFollower();  // go back to line follower logic
-    } else if (Line.LeftDetect == 1) {
+    } else if (Line.LeftDetect >= 1) {
       GoHome2();
+      // Mcon.RightRotate(150);
     }
   }
 }
@@ -476,7 +493,7 @@ void EnterGreen() {
   } else if ((m == JDT2 + 100)) {
     Mcon.Reset();
   } else if ((m > JDT2 + 100) && (m < JDT2 + 400)) {  // ### Rotation MARK ###
-    Mcon.RightRotate(150);
+    Mcon.RightRotate(155);
   } else if (m == JDT2 + 400) {  // Reset rotation information
     Mcon.Reset();
   } else if ((m > JDT2 + 400) && (m < JDT2 + 550)) {  // Go near block
@@ -489,7 +506,7 @@ void EnterGreen() {
   } else if ((m > JDT2 + 650) && (m < JDT2 + 800)) {  // go out of box
     Mcon.SetMotors(-150, -135);
   } else if ((m > JDT2 + 800) && (m < JDT2 + 1000)) {  // ### Rotation MARK ###
-    Mcon.LeftRotate(115);
+    Mcon.LeftRotate(105);
   } else if (m == JDT2 + 1000) {  // Reset rotation information
     Mcon.Reset();
   } else if ((m > JDT2 + 1000) && (m < JDT2 + 1050)) {
@@ -540,19 +557,19 @@ void GoHome1() {
   } else if (m == JDT3 + 100) {
     Mcon.Reset();
   } else if ((m > JDT3 + 100) && (m < JDT3 + 400)) {  // ### Rotation MARK ###
-    Mcon.RightRotate(150);
+    Mcon.RightRotate(140);
   } else if (m == JDT3 + 400) {  // Reset rotation information
     Mcon.Reset();
   } else if (m > JDT3 + 400) {  // Go near block
     Line.Box();
     if (Line.BoxDetect == 0) {
-      LineFollowerSlow();
+      Position();
     } else {
       if (m < JDT4 + 50) {
         StopMotor();
-      } else if ((m > JDT4 + 50) && (m < JDT4 + 200)) {
+      } else if ((m > JDT4 + 50) && (m < JDT4 + 170)) {
         Mcon.SetMotors(150, 135);
-      } else if (m > JDT4 + 200) {
+      } else if ((m > JDT4 + 170) || (m > JDT3 + 800)) {
         StopMotor();
       }
     }
@@ -568,19 +585,19 @@ void GoHome2() {
   } else if (m == JDT5 + 100) {
     Mcon.Reset();
   } else if ((m > JDT5 + 100) && (m < JDT5 + 400)) {  // ### Rotation MARK ###
-    Mcon.LeftRotate(120);
+    Mcon.LeftRotate(110);
   } else if (m == JDT5 + 400) {  // Reset rotation information
     Mcon.Reset();
   } else if (m > JDT5 + 400) {  // Go near block
     Line.Box();
     if (Line.BoxDetect == 0) {
-      LineFollowerSlow();
+      Position();
     } else {
       if (m < JDT4 + 50) {
         StopMotor();
-      } else if ((m > JDT4 + 50) && (m < JDT4 + 200)) {
+      } else if ((m > JDT4 + 50) && (m < JDT4 + 170)) {
         Mcon.SetMotors(150, 135);
-      } else if (m > JDT4 + 200) {
+      } else if ((m > JDT4 + 170) || (m > JDT3 + 800)) {
         StopMotor();
       }
     }

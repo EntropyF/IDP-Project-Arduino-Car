@@ -43,13 +43,13 @@ void LineSensor::Junction() {
   }
   if (DetectDONE2 == 1) {
     DetectCounter2++;
-    if (DetectCounter2 >= 700) {
+    if (DetectCounter2 >= 1150) {
       DetectDONE2 = 0;
     }
   }
   if (DetectDONE3 == 1) {
     DetectCounter3++;
-    if (DetectCounter3 >= 1000) {
+    if (DetectCounter3 >= 3000) {
       DetectDONE3 = 0;
     }
   }
